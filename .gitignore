@@ -1,0 +1,21 @@
+# Ignorar arquivos e pastas gerados automaticamente
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignorar arquivos de cache
+*.cache
+*.log
+*.json
+
+# Ignorar arquivos de saída
+musical_map.html
+
+# Ignorar configurações específicas do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignorar configurações específicas do editor
+.vscode/
+.idea/
