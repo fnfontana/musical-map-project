@@ -25,3 +25,12 @@ Thumbs.db
 .idea/
 
 tasks/
+
+# Adicionar exclusão de arquivos temporários
+*.tmp
+
+# Ignorar arquivos de backup
+*.bak
+
+# Ignorar logs de teste
+pytest.log
