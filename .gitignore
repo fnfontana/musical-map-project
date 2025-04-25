@@ -29,6 +29,12 @@ tasks/
 # Adicionar exclusão de arquivos temporários
 *.tmp
 
+# Ignorar arquivos temporários
+temp/
+
+# Ignorar arquivos HTML gerados
+musical_map.html
+
 # Ignorar arquivos de backup
 *.bak
 
