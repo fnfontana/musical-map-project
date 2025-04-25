@@ -14,6 +14,7 @@ data/city_coords_cache.json.bak
 # Ignorar arquivos de saída
 data/musical_map.db
 output/
+musical_styles.csv
 
 # Ignorar configurações específicas do sistema operacional
 .DS_Store
