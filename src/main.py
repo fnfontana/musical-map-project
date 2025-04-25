@@ -23,11 +23,18 @@ try:
     style_df = pd.read_sql_query("SELECT * FROM musical_styles", conn)
     conn.close()
     if style_df.empty:
-        print("Erro: o banco de dados está vazio.")
-        exit(1)
+        msg = "Erro: o banco de dados está vazio."
+        print(msg)
+        if __name__ == "__main__" and not is_test_env():
+            exit(1)
+        else:
+            raise RuntimeError(msg)
 except Exception as e:
     print(f"Erro ao ler o banco de dados: {e}")
-    exit(1)
+    if __name__ == "__main__" and not is_test_env():
+        exit(1)
+    else:
+        raise
 
 # Renomear a coluna 'estado' para 'name' para que o merge funcione corretamente
 style_df = style_df.rename(columns={'estado': 'name', 'genero_musical': 'Gênero musical', 'cidade': 'Cidade', 'comentario': 'Comentário contextual'})

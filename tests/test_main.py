@@ -1,6 +1,32 @@
 import unittest
 import sys
 import os
+import sqlite3
+
+# Garante que o banco de dados e a tabela existem e insere dados de teste antes de importar o main.py
+DB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../data/musical_map.db'))
+conn = sqlite3.connect(DB_PATH)
+cursor = conn.cursor()
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS musical_styles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        estado TEXT NOT NULL,
+        cidade TEXT NOT NULL,
+        genero_musical TEXT NOT NULL,
+        comentario TEXT
+    )
+''')
+# Insere dados de teste se a tabela estiver vazia
+cursor.execute('SELECT COUNT(*) FROM musical_styles')
+if cursor.fetchone()[0] == 0:
+    cursor.execute('''
+        INSERT INTO musical_styles (estado, cidade, genero_musical, comentario)
+        VALUES ('California', 'Los Angeles', 'Rock', 'Movimento do rock'),
+               ('Texas', 'Austin', 'Country', 'Origem do country moderno')
+    ''')
+conn.commit()
+conn.close()
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 from main import style_df, merged
 
