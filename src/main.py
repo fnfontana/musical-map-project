@@ -12,10 +12,14 @@ def is_test_env():
     # Detecta se está rodando sob pytest
     return ('pytest' in sys.modules) or (os.environ.get('PYTEST_CURRENT_TEST') is not None)
 
+# Caminhos corretos para arquivos
+DB_PATH = os.path.join('data', 'musical_map.db')
+CACHE_PATH = os.path.join('data', 'city_coords_cache.json')
+OUTPUT_HTML = os.path.join('output', 'musical_map.html')
+
 # Ler dados do banco de dados SQLite
 try:
-    db_path = os.path.join('data', 'musical_map.db')
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(DB_PATH)
     style_df = pd.read_sql_query("SELECT * FROM musical_styles", conn)
     conn.close()
     if style_df.empty:
@@ -27,6 +31,9 @@ except Exception as e:
 
 # Renomear a coluna 'estado' para 'name' para que o merge funcione corretamente
 style_df = style_df.rename(columns={'estado': 'name', 'genero_musical': 'Gênero musical', 'cidade': 'Cidade', 'comentario': 'Comentário contextual'})
+
+# Remover duplicatas antes do merge
+style_df = style_df.drop_duplicates(subset=["name", "Cidade", "Gênero musical"])
 
 # Normalizar os nomes dos estados no banco de dados para corresponder aos do GeoJSON
 state_name_mapping = {
@@ -104,9 +111,8 @@ folium.TileLayer(
 
 # Função para obter coordenadas de uma cidade e estado
 geolocator = Nominatim(user_agent="musical_map_locator")
-cache_file = "city_coords_cache.json"
-if os.path.exists(cache_file):
-    with open(cache_file, 'r', encoding='utf-8') as f:
+if os.path.exists(CACHE_PATH):
+    with open(CACHE_PATH, 'r', encoding='utf-8') as f:
         city_coords_cache = json.load(f)
 else:
     city_coords_cache = {}
@@ -115,12 +121,13 @@ def get_city_coords(city, state):
     key = f"{city}, {state}"
     if key in city_coords_cache:
         return city_coords_cache[key]
+    # Só busca se não existir no cache
     try:
         location = geolocator.geocode(f"{city}, {state}, USA")
         if location:
             coords = [location.latitude, location.longitude]
             city_coords_cache[key] = coords
-            with open(cache_file, 'w', encoding='utf-8') as f:
+            with open(CACHE_PATH, 'w', encoding='utf-8') as f:
                 json.dump(city_coords_cache, f)
             time.sleep(1)  # Evita sobrecarga na API
             return coords
@@ -155,8 +162,8 @@ for idx, row in merged.iterrows():
 folium.LayerControl().add_to(m)
 
 # Salvar o mapa interativo em um arquivo HTML
-m.save("musical_map.html")
-print("Mapa salvo em 'musical_map.html'.")
+m.save(OUTPUT_HTML)
+print(f"Mapa salvo em '{OUTPUT_HTML}'.")
 
 # Perguntar ao usuário se deseja adicionar links da Wikipedia
 if not is_test_env():
