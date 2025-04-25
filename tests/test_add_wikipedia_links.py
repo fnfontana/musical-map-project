@@ -6,7 +6,8 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 # Função a ser testada
-from add_wikipedia_links import search_wikipedia_link
+from add_wikipedia_links import search_wikipedia_link, add_wikipedia_links, DB_PATH
+import sqlite3
 
 # Mock para substituir a função get_genres_from_db
 def mock_get_genres_from_db():
@@ -27,6 +28,33 @@ def criar_html_temporario():
     yield
     # Limpeza opcional: remover arquivo após o teste
     # os.remove(html_path)
+
+def setup_module(module):
+    # Cria banco de dados temporário para o teste
+    if os.path.exists(DB_PATH):
+        os.remove(DB_PATH)
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS musical_styles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            estado TEXT NOT NULL,
+            cidade TEXT NOT NULL,
+            genero_musical TEXT NOT NULL,
+            comentario TEXT
+        )
+    ''')
+    cursor.execute('''
+        INSERT INTO musical_styles (estado, cidade, genero_musical, comentario)
+        VALUES ('TestState', 'TestCity', 'Test Genre', 'Comentário de teste')
+    ''')
+    conn.commit()
+    conn.close()
+
+def teardown_module(module):
+    # Remove banco de dados após o teste
+    if os.path.exists(DB_PATH):
+        os.remove(DB_PATH)
 
 # Teste da função de busca de link da Wikipedia (mockando requests)
 def test_search_wikipedia_link(monkeypatch):
@@ -84,3 +112,17 @@ def test_html_update(tmp_path):
         with open(html_path, 'r', encoding='utf-8') as f:
             result = f.read()
         assert '<a href="https://en.wikipedia.org/wiki/Test_Genre" target="_blank">Test Genre</a>' in result
+
+def test_add_wikipedia_links(monkeypatch):
+    # Mocka a busca para sempre retornar o mesmo link
+    monkeypatch.setattr('add_wikipedia_links.search_wikipedia_link', lambda genre: 'https://en.wikipedia.org/wiki/Test_Genre')
+    # Executa a função principal
+    add_wikipedia_links()
+    # Verifica se o link foi inserido no banco de dados
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute('SELECT wikipedia_link FROM musical_styles WHERE genero_musical = ?', ('Test Genre',))
+    result = cursor.fetchone()
+    conn.close()
+    assert result is not None
+    assert result[0] == 'https://en.wikipedia.org/wiki/Test_Genre'
