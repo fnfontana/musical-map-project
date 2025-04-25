@@ -2,14 +2,38 @@ import pytest
 import os
 import pandas as pd
 from unittest.mock import patch
+import sys
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 # Função a ser testada
 from add_wikipedia_links import search_wikipedia_link
 
+@pytest.fixture(autouse=True)
+def criar_html_temporario():
+    # Garante que musical_map.html exista antes dos testes
+    html_path = os.path.join(os.path.dirname(__file__), '..', 'musical_map.html')
+    if not os.path.exists(html_path):
+        with open(html_path, 'w', encoding='utf-8') as f:
+            f.write('<b>Gênero musical:</b> <span style="color:#2a5599">Test Genre</span>')
+    yield
+    # Limpeza opcional: remover arquivo após o teste
+    # os.remove(html_path)
+
 # Teste da função de busca de link da Wikipedia (mockando requests)
 def test_search_wikipedia_link(monkeypatch):
     class MockResponse:
-        text = '''<a href="/url?q=https://en.wikipedia.org/wiki/Test_Genre&sa=U&ved=2ah">Wikipedia</a>'''
+        def __init__(self):
+            self.status_code = 200
+        def raise_for_status(self):
+            pass
+        def json(self):
+            return {
+                "query": {
+                    "search": [
+                        {"title": "Test Genre"}
+                    ]
+                }
+            }
     def mock_get(*args, **kwargs):
         return MockResponse()
     monkeypatch.setattr('requests.get', mock_get)

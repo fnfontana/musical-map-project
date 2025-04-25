@@ -10,9 +10,12 @@ def create_tables():
             cidade TEXT NOT NULL,
             genero_musical TEXT NOT NULL,
             comentario TEXT,
-            latitude REAL,
-            longitude REAL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            latitude REAL NOT NULL,
+            longitude REAL NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            source TEXT,
+            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            geocode_cache TEXT
         );
     ''')
     conn.commit()

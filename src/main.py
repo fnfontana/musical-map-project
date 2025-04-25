@@ -6,10 +6,16 @@ import time
 import os
 import json
 import sqlite3
+import sys
+
+def is_test_env():
+    # Detecta se está rodando sob pytest
+    return ('pytest' in sys.modules) or (os.environ.get('PYTEST_CURRENT_TEST') is not None)
 
 # Ler dados do banco de dados SQLite
 try:
-    conn = sqlite3.connect('musical_map.db')
+    db_path = os.path.join('data', 'musical_map.db')
+    conn = sqlite3.connect(db_path)
     style_df = pd.read_sql_query("SELECT * FROM musical_styles", conn)
     conn.close()
     if style_df.empty:
@@ -153,7 +159,8 @@ m.save("musical_map.html")
 print("Mapa salvo em 'musical_map.html'.")
 
 # Perguntar ao usuário se deseja adicionar links da Wikipedia
-resposta = input("Deseja adicionar links da Wikipedia aos gêneros musicais no mapa? (s/n): ").strip().lower()
-if resposta == 's':
-    import subprocess
-    subprocess.run(['python', 'src/add_wikipedia_links.py'])
+if not is_test_env():
+    resposta = input("Deseja adicionar links da Wikipedia aos gêneros musicais no mapa? (s/n): ").strip().lower()
+    if resposta == 's':
+        import subprocess
+        subprocess.run(['python', 'src/add_wikipedia_links.py'])
