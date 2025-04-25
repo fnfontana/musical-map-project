@@ -1,3 +1,8 @@
+# Ignorar backup por padrão, mas permitir arquivos específicos
+backup/*
+!backup/musical_map.db
+!backup/musical_styles.csv
+
 # Ignorar arquivos e pastas gerados automaticamente
 __pycache__/
 *.pyc
@@ -16,12 +21,7 @@ data/musical_map.db
 data/musical_styles.csv
 output/
 
-# Permitir arquivos específicos no backup
-!backup/musical_map.db
-!backup/musical_styles.csv
-
 # Ignorar outros arquivos de backup
-backup/*
 *.bak
 
 # Ignorar configurações específicas do sistema operacional
