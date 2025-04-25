@@ -1,74 +1,113 @@
 # Musical Map Project
 
-This project visualizes musical styles across the United States using an interactive map. The map is generated using Python and several libraries, including Folium, GeoPandas, and Geopy.
+Projeto que visualiza estilos musicais nos Estados Unidos usando um mapa interativo. O mapa é gerado usando Python e diversas bibliotecas, incluindo Folium, GeoPandas e Geopy.
 
-## Features
+## Funcionalidades
 
-- **Interactive Map**: Displays musical styles by state and city, with popups containing additional contextual information.
-- **Geocoding**: Automatically fetches coordinates for cities and states using the Geopy library.
-- **Wikipedia Integration**: Optionally adds Wikipedia links to musical genres for further exploration.
-- **Data Caching**: Caches city coordinates to improve performance and reduce API calls.
+- **Mapa Interativo**: Exibe estilos musicais por estado e cidade, com popups contendo informações contextuais.
+- **Geocodificação**: Busca automática de coordenadas para cidades e estados usando Geopy.
+- **Integração Wikipedia**: Adiciona links da Wikipedia para gêneros musicais.
+- **Sistema de Cache**: Armazena coordenadas de cidades para melhor performance.
+- **Banco de Dados**: Armazenamento persistente em SQLite.
+- **Monitoramento**: Sistema de observação de mudanças em tempo real.
 
-## Project Structure
+## Estrutura do Projeto
 
-- `main.py`: Main script to generate the musical map.
-- `add_wikipedia_links.py`: Script to add Wikipedia links to the map.
-- `musical_styles.csv`: Input data containing musical styles, states, cities, and contextual comments.
-- `musical_map.html`: Output file containing the generated interactive map.
-- `city_coords_cache.json`: Cache file for city coordinates.
-- `test_add_wikipedia_links.py` and `test_main.py`: Unit tests for the project.
+```
+musical-map-project/
+├── src/                    # Código fonte principal
+│   ├── main.py            # Script principal do mapa
+│   ├── add_wikipedia_links.py  # Integração com Wikipedia
+│   ├── populate_database.py    # População do banco de dados
+│   └── watch_database.py       # Monitoramento de mudanças
+├── tests/                 # Testes unitários e de integração
+├── data/                  # Dados e banco SQLite
+├── output/                # Arquivos gerados
+├── config/                # Arquivos de configuração
+├── project/               # Documentação do projeto
+└── backup/               # Backup de dados importantes
+```
 
-## Requirements
+## Documentação
 
-- Python 3.9 or higher
-- Libraries: Folium, GeoPandas, Pandas, Geopy
+A documentação completa do projeto está organizada no GitHub Projects, dividida em três áreas principais:
 
-## Installation
+- [Sistema Autônomo v2.0](https://github.com/fnfontana/musical-map-project/issues/14)
+- [Interface Interativa](https://github.com/fnfontana/musical-map-project/issues/15)
+- [Refatoração da Arquitetura](https://github.com/fnfontana/musical-map-project/issues/16)
 
-1. Clone the repository:
+## Requisitos
+
+- Python 3.9 ou superior
+- Bibliotecas: Ver `requirements.txt`
+- SQLite 3
+
+## Instalação
+
+1. Clone o repositório:
 
    ```bash
    git clone <repository-url>
    cd musical-map-project
    ```
 
-2. Install the required Python libraries:
+2. Instale as dependências:
 
    ```bash
    pip install -r requirements.txt
    ```
 
-## Usage
+## Uso
 
-1. Prepare the `musical_styles.csv` file with the following columns:
-   - `Estado`: State name (in Portuguese, e.g., "Nova York").
-   - `Cidade`: City name.
-   - `Gênero musical`: Musical genre.
-   - `Comentário contextual`: Contextual comments.
-
-2. Run the main script to generate the map:
+1. Configure o banco de dados:
 
    ```bash
-   python main.py
+   python src/populate_database.py
    ```
 
-3. Open the generated `musical_map.html` file in a web browser to view the map.
+2. Execute o script principal para gerar o mapa:
 
-4. Optionally, add Wikipedia links to the map by following the prompt in the terminal.
+   ```bash
+   python src/main.py
+   ```
 
-## Testing
+3. Abra o arquivo `output/musical_map.html` em um navegador.
 
-Run the unit tests to ensure the project works as expected:
+4. Opcional: Adicione links da Wikipedia:
+
+   ```bash
+   python src/add_wikipedia_links.py
+   ```
+
+5. Para monitorar mudanças no banco de dados:
+
+   ```bash
+   python src/watch_database.py
+   ```
+
+## Testes
+
+Execute os testes unitários:
 
 ```bash
 pytest
 ```
 
-## Notes
+## Desenvolvimento
 
-- Ensure you have an active internet connection for geocoding and downloading GeoJSON data.
-- The project uses a cache (`city_coords_cache.json`) to store city coordinates and reduce API calls.
+O projeto está em evolução ativa, com foco em:
 
-## License
+- Sistema totalmente autônomo
+- Interface mais interativa
+- Melhor arquitetura e manutenibilidade
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+## Notas
+
+- Necessária conexão com internet para geocodificação e Wikipedia
+- Cache de coordenadas em `data/city_coords_cache.json`
+- Backup automático dos dados em `backup/`
+- Logs de execução em `output/logs`
+
+## Licença
+
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo LICENSE para detalhes.

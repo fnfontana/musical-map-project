@@ -4,17 +4,21 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Ignorar arquivos de cache
+# Ignorar arquivos de cache e dados
 *.cache
 *.log
 *.json
-
+data/city_coords_cache.json
 data/city_coords_cache.json.bak
 
-# Ignorar arquivos de saída
+# Ignorar banco de dados e arquivos de saída
 data/musical_map.db
 output/
 musical_styles.csv
+
+# Ignorar arquivos de backup
+backup/
+*.bak
 
 # Ignorar configurações específicas do sistema operacional
 .DS_Store
@@ -24,22 +28,23 @@ Thumbs.db
 .vscode/
 .idea/
 
-tasks/
+# Ignorar arquivos de configuração sensíveis
+config/github_config.yaml
 
-# Adicionar exclusão de arquivos temporários
-*.tmp
+# Ignorar diretórios de desenvolvimento
+tasks/
+temp/
 
 # Ignorar arquivos temporários
-temp/
+*.tmp
 
 # Ignorar arquivos HTML gerados
 musical_map.html
-
-# Ignorar arquivos de backup
-*.bak
+output/musical_map.html
 
 # Ignorar logs de teste
 pytest.log
+.pytest_cache/
 
-# Ignorar pasta de documentação de análise e guias
-overview/
+# Manter documentação do projeto
+# project/ # Não ignorar mais, pois contém documentação importante
