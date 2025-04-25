@@ -40,3 +40,6 @@ musical_map.html
 
 # Ignorar logs de teste
 pytest.log
+
+# Ignorar pasta de documentação de análise e guias
+overview/
