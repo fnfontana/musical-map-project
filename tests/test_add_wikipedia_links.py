@@ -1,12 +1,21 @@
 import pytest
 import os
 import pandas as pd
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 # Função a ser testada
 from add_wikipedia_links import search_wikipedia_link
+
+# Mock para substituir a função get_genres_from_db
+def mock_get_genres_from_db():
+    return ['Test Genre']
+
+# Substituir a função original pelo mock
+@pytest.fixture(autouse=True)
+def mock_database(monkeypatch):
+    monkeypatch.setattr('add_wikipedia_links.get_genres_from_db', mock_get_genres_from_db)
 
 @pytest.fixture(autouse=True)
 def criar_html_temporario():

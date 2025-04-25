@@ -36,34 +36,38 @@ def get_genres_from_db():
     conn.close()
     return df['genero_musical'].dropna().unique()
 
-genres = get_genres_from_db()
+def main():
+    genres = get_genres_from_db()
 
-# Buscar links da Wikipedia para cada gênero
-wikipedia_links = {}
-for genre in genres:
-    print(f"Pesquisando link para: {genre}")
-    link = search_wikipedia_link(genre)
-    if link:
-        print(f"  Encontrado: {link}")
-        wikipedia_links[genre] = link
-    else:
-        print(f"  Não encontrado.")
-    time.sleep(2)  # Evita bloqueio do Google
+    # Buscar links da Wikipedia para cada gênero
+    wikipedia_links = {}
+    for genre in genres:
+        print(f"Pesquisando link para: {genre}")
+        link = search_wikipedia_link(genre)
+        if link:
+            print(f"  Encontrado: {link}")
+            wikipedia_links[genre] = link
+        else:
+            print(f"  Não encontrado.")
+        time.sleep(2)  # Evita bloqueio do Google
 
-# Atualizar o HTML inserindo os links
-html_file = "musical_map.html"
-with open(html_file, 'r', encoding='utf-8') as f:
-    html = f.read()
+    # Atualizar o HTML inserindo os links
+    html_file = "musical_map.html"
+    with open(html_file, 'r', encoding='utf-8') as f:
+        html = f.read()
 
-for genre, link in wikipedia_links.items():
-    # Substitui apenas a primeira ocorrência de cada gênero musical no HTML
-    pattern = rf'(<b>Gênero musical:</b> <span style="color:#2a5599">){re.escape(genre)}(</span>)'
-    replacement = rf'\1<a href="{link}" target="_blank">{genre}</a>\2'
-    html, n = re.subn(pattern, replacement, html, count=1)
-    if n:
-        print(f"Link inserido para: {genre}")
+    for genre, link in wikipedia_links.items():
+        # Substitui apenas a primeira ocorrência de cada gênero musical no HTML
+        pattern = rf'(<b>Gênero musical:</b> <span style="color:#2a5599">){re.escape(genre)}(</span>)'
+        replacement = rf'\1<a href="{link}" target="_blank">{genre}</a>\2'
+        html, n = re.subn(pattern, replacement, html, count=1)
+        if n:
+            print(f"Link inserido para: {genre}")
 
-with open(html_file, 'w', encoding='utf-8') as f:
-    f.write(html)
+    with open(html_file, 'w', encoding='utf-8') as f:
+        f.write(html)
 
-print("Links da Wikipedia inseridos no musical_map.html.")
+    print("Links da Wikipedia inseridos no musical_map.html.")
+
+if __name__ == "__main__":
+    main()
