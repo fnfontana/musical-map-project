@@ -13,8 +13,8 @@ data/city_coords_cache.json.bak
 
 # Ignorar banco de dados e arquivos de saída
 data/musical_map.db
+data/musical_styles.csv
 output/
-musical_styles.csv
 
 # Permitir arquivos específicos no backup
 !backup/musical_map.db
