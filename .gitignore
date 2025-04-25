@@ -16,8 +16,12 @@ data/musical_map.db
 output/
 musical_styles.csv
 
-# Ignorar arquivos de backup
-backup/
+# Permitir arquivos específicos no backup
+!backup/musical_map.db
+!backup/musical_styles.csv
+
+# Ignorar outros arquivos de backup
+backup/*
 *.bak
 
 # Ignorar configurações específicas do sistema operacional
@@ -34,6 +38,7 @@ config/github_config.yaml
 # Ignorar diretórios de desenvolvimento
 tasks/
 temp/
+project/
 
 # Ignorar arquivos temporários
 *.tmp
@@ -45,6 +50,3 @@ output/musical_map.html
 # Ignorar logs de teste
 pytest.log
 .pytest_cache/
-
-# Manter documentação do projeto
-# project/ # Não ignorar mais, pois contém documentação importante
