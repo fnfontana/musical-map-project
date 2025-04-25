@@ -4,6 +4,7 @@ import requests
 import time
 import re
 from bs4 import BeautifulSoup
+import sqlite3
 
 # Função para pesquisar o link da Wikipedia em inglês para um termo
 
@@ -28,10 +29,14 @@ def search_wikipedia_link(term):
         print(f"Erro ao pesquisar {term}: {e}")
     return None
 
-# Ler gêneros musicais únicos do CSV
-csv_file = "musical_styles.csv"
-df = pd.read_csv(csv_file)
-genres = df['Gênero musical'].dropna().unique()
+# Ler gêneros musicais únicos do banco de dados SQLite
+def get_genres_from_db():
+    conn = sqlite3.connect('musical_map.db')
+    df = pd.read_sql_query("SELECT DISTINCT genero_musical FROM musical_styles WHERE genero_musical IS NOT NULL", conn)
+    conn.close()
+    return df['genero_musical'].dropna().unique()
+
+genres = get_genres_from_db()
 
 # Buscar links da Wikipedia para cada gênero
 wikipedia_links = {}

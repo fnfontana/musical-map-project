@@ -9,8 +9,11 @@ __pycache__/
 *.log
 *.json
 
+data/city_coords_cache.json.bak
+
 # Ignorar arquivos de saída
-musical_map.html
+data/musical_map.db
+output/
 
 # Ignorar configurações específicas do sistema operacional
 .DS_Store
@@ -20,5 +23,4 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Ignorar a pasta tasks e todos os arquivos dentro dela
 tasks/

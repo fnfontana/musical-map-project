@@ -5,25 +5,24 @@ from geopy.geocoders import Nominatim
 import time
 import os
 import json
+import sqlite3
 
-# Ler o arquivo CSV com os dados musicais completos, garantindo a leitura de todos os itens
-csv_file = "musical_styles.csv"
+# Ler dados do banco de dados SQLite
 try:
-    chunks = []
-    for chunk in pd.read_csv(csv_file, chunksize=10000):
-        chunks.append(chunk)
-    style_df = pd.concat(chunks, ignore_index=True)
+    conn = sqlite3.connect('musical_map.db')
+    style_df = pd.read_sql_query("SELECT * FROM musical_styles", conn)
+    conn.close()
     if style_df.empty:
-        print("Erro: o arquivo CSV está vazio.")
+        print("Erro: o banco de dados está vazio.")
         exit(1)
 except Exception as e:
-    print(f"Erro ao ler o arquivo CSV: {e}")
+    print(f"Erro ao ler o banco de dados: {e}")
     exit(1)
 
-# Renomear a coluna 'Estado' para 'name' para que o merge funcione corretamente
-style_df = style_df.rename(columns={'Estado': 'name'})
+# Renomear a coluna 'estado' para 'name' para que o merge funcione corretamente
+style_df = style_df.rename(columns={'estado': 'name', 'genero_musical': 'Gênero musical', 'cidade': 'Cidade', 'comentario': 'Comentário contextual'})
 
-# Normalizar os nomes dos estados no CSV para corresponder aos do GeoJSON
+# Normalizar os nomes dos estados no banco de dados para corresponder aos do GeoJSON
 state_name_mapping = {
     "Nova York": "New York",
     "Califórnia": "California",
@@ -157,4 +156,4 @@ print("Mapa salvo em 'musical_map.html'.")
 resposta = input("Deseja adicionar links da Wikipedia aos gêneros musicais no mapa? (s/n): ").strip().lower()
 if resposta == 's':
     import subprocess
-    subprocess.run(['python', 'add_wikipedia_links.py'])
+    subprocess.run(['python', 'src/add_wikipedia_links.py'])
