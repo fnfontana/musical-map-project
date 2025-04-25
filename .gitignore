@@ -19,3 +19,6 @@ Thumbs.db
 # Ignorar configurações específicas do editor
 .vscode/
 .idea/
+
+# Ignorar a pasta tasks e todos os arquivos dentro dela
+tasks/
