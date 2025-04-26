@@ -33,7 +33,12 @@ Thumbs.db
 .idea/
 
 # Ignorar arquivos de configuração sensíveis
-config/github_config.yaml
+# dev/github/github_config.yaml já está listado
+dev/github/github_config.yaml
+# Ignorar scripts antigos de integração com o GitHub (já removidos)
+# dev/github/create_github_issue.py
+# dev/github/github_project_setup.py
+# dev/github/setup_project_board.py
 
 # Ignorar diretórios de desenvolvimento
 tasks/
