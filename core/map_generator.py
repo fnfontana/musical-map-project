@@ -24,7 +24,7 @@ def generate_map(style_df, output_html, cache_path):
     if merged.crs is None or merged.crs.to_string() != 'EPSG:4326':
         merged = merged.to_crs('EPSG:4326')
     missing_states = merged[merged['Gênero musical'].isna()]
-    print("Estados sem dados musicais após o merge:", missing_states['name'].tolist())
+    logger.warning("Estados sem dados musicais após o merge: %s", missing_states['name'].tolist())
     m = folium.Map(location=[39.8283, -98.5795], zoom_start=4, tiles=None)
     folium.TileLayer(
         tiles='https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}',
