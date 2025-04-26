@@ -59,4 +59,4 @@ def generate_map(style_df, output_html, cache_path):
             add_custom_marker(m, [lat, lon], popup_html)
     add_layer_control(m)
     m.save(output_html)
-    print(f"Mapa salvo em '{output_html}'.")
+    logger.info("Mapa salvo em '%s'.", output_html)
