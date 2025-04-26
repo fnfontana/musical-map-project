@@ -11,6 +11,9 @@ import json
 from monitoring.events import bus
 from core.database import get_styles_from_db
 from core.map_generator import generate_map
+from monitoring.logger import get_logger
+
+logger = get_logger(__name__)
 
 def is_test_env():
     # Detecta se está rodando sob pytest
@@ -18,7 +21,7 @@ def is_test_env():
 
 def log_event(event_name):
     def handler(*args, **kwargs):
-        print(f"[EVENTO] {event_name} - args: {args} kwargs: {kwargs}")
+        logger.info(f"[EVENTO] {event_name} - args: {args} kwargs: {kwargs}")
     return handler
 
 bus.subscribe('start_processing', log_event('start_processing'))
@@ -37,14 +40,14 @@ try:
     style_df = get_styles_from_db()
     if style_df.empty:
         msg = "Erro: o banco de dados está vazio."
-        print(msg)
+        logger.warning(msg)
         if __name__ == "__main__" and not is_test_env():
             exit(1)
         else:
             raise RuntimeError(msg)
     bus.emit('data_loaded', style_df=style_df)
 except Exception as e:
-    print(e)
+    logger.error(e)
     if __name__ == "__main__" and not is_test_env():
         exit(1)
     else:
@@ -107,7 +110,7 @@ style_df['name'] = style_df['name'].replace(state_name_mapping)
 # Gerar o mapa interativo
 generate_map(style_df, OUTPUT_HTML, CACHE_PATH)
 bus.emit('map_generated', output=OUTPUT_HTML)
-print(f"Mapa salvo em '{OUTPUT_HTML}'.")
+logger.info(f"Mapa salvo em '{OUTPUT_HTML}'.")
 
 # Perguntar ao usuário se deseja adicionar links da Wikipedia
 if not is_test_env():

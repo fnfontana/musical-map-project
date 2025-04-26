@@ -1,0 +1,20 @@
+# config/settings.yaml
+# Configurações customizáveis do usuário para o projeto Musical Map
+
+# Caminho do banco de dados
+# db_path: output/musical_map.db
+
+# Diretório de logs
+# log_dir: output/logs
+
+# Caminho do arquivo HTML do mapa
+# map_html: output/musical_map.html
+
+# Cache de coordenadas de cidades
+# city_coords_cache: data/city_coords_cache.json
+
+# Idioma da Wikipedia
+# wikipedia_language: pt
+
+# Ativar modo debug
+# debug: false

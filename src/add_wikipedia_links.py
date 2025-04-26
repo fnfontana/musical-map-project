@@ -1,10 +1,7 @@
 # add_wikipedia_links.py
 import sys
 import os
-# Garante que a raiz do projeto está no sys.path para todos os contextos
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import pandas as pd
 import requests
@@ -87,7 +84,7 @@ def add_wikipedia_links():
             else:
                 bus.emit('wikipedia_link_error', genre=genre_name, reason='link não encontrado')
         except Exception as e:
-            logger.error(f"Não foi possível encontrar um link para {genre_name}: {e}")
+            logger.warning(f"Não foi possível encontrar um link para {genre_name}: {e}")
             bus.emit('wikipedia_link_error', genre=genre_name, reason=str(e))
 
     # Salvar alterações e fechar conexão
