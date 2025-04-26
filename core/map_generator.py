@@ -5,8 +5,10 @@ import os
 import json
 import time
 from geopy.geocoders import Nominatim
-from utils.cache import get_city_coords
+from core.geocoding import get_city_coordinates_with_cache
 from core.database import get_styles_from_db
+from interface.map_controls import add_layer_control
+from interface.markers import add_custom_marker
 
 def generate_map(style_df, output_html, cache_path):
     # Renomear colunas para merge
@@ -34,7 +36,7 @@ def generate_map(style_df, output_html, cache_path):
     geolocator = Nominatim(user_agent="musical_map_locator")
     for idx, row in merged.iterrows():
         if pd.notna(row['Gênero musical']):
-            coords = get_city_coords(row['Cidade'], row['name'], cache_path)
+            coords = get_city_coordinates_with_cache(row['Cidade'], row['name'], cache_path)
             if coords:
                 lat, lon = coords
             else:
@@ -54,10 +56,7 @@ def generate_map(style_df, output_html, cache_path):
                 <span style="font-size: 14px; color: #444;">{row['Comentário contextual']}</span>
             </div>
             '''
-            folium.Marker(
-                location=[lat, lon],
-                popup=folium.Popup(popup_html, max_width=300)
-            ).add_to(m)
-    folium.LayerControl().add_to(m)
+            add_custom_marker(m, [lat, lon], popup_html)
+    add_layer_control(m)
     m.save(output_html)
     print(f"Mapa salvo em '{output_html}'.")

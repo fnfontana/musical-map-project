@@ -13,7 +13,7 @@ import shutil
 import sqlite3
 import pytest
 from core.database import get_styles_from_db, create_musical_styles_table, DB_PATH
-from populate_database import populate_database, INPUT_DIR
+from src.populate_database import populate_database, INPUT_DIR
 
 def setup_module(module):
     os.makedirs(INPUT_DIR, exist_ok=True)

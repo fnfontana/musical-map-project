@@ -3,23 +3,38 @@ import json
 import time
 from geopy.geocoders import Nominatim
 
+class CacheManager:
+    def __init__(self, cache_path):
+        self.cache_path = cache_path
+
+    def get(self, key):
+        if os.path.exists(self.cache_path):
+            with open(self.cache_path, 'r', encoding='utf-8') as f:
+                cache = json.load(f)
+                return cache.get(key)
+        return None
+
+    def set(self, key, value):
+        cache = {}
+        if os.path.exists(self.cache_path):
+            with open(self.cache_path, 'r', encoding='utf-8') as f:
+                cache = json.load(f)
+        cache[key] = value
+        with open(self.cache_path, 'w', encoding='utf-8') as f:
+            json.dump(cache, f)
+
 def get_city_coords(city, state, cache_path):
-    if os.path.exists(cache_path):
-        with open(cache_path, 'r', encoding='utf-8') as f:
-            city_coords_cache = json.load(f)
-    else:
-        city_coords_cache = {}
+    cache_manager = CacheManager(cache_path)
     key = f"{city}, {state}"
-    if key in city_coords_cache:
-        return city_coords_cache[key]
+    cached_coords = cache_manager.get(key)
+    if cached_coords:
+        return cached_coords
     geolocator = Nominatim(user_agent="musical_map_locator")
     try:
         location = geolocator.geocode(f"{city}, {state}, USA")
         if location:
             coords = [location.latitude, location.longitude]
-            city_coords_cache[key] = coords
-            with open(cache_path, 'w', encoding='utf-8') as f:
-                json.dump(city_coords_cache, f)
+            cache_manager.set(key, coords)
             time.sleep(1)
             return coords
     except Exception as e:
