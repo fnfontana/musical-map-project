@@ -1,0 +1,15 @@
+# Exemplo de arquivo YAML para criar uma issue no GitHub
+# Salve como dev/github/issue_configuracao_ci_cd.yaml
+
+title: Configuração de Projeto no GitHub e Implementação de CI/CD
+body: |
+  ## Objetivos
+
+  - Revisar e aprimorar as configurações do repositório no GitHub (permissões, branch protection, templates de issues/PRs, etc).
+  - Implementar um ciclo de CI/CD utilizando GitHub Actions para rodar testes automatizados e validação de código.
+  - Configurar Dependabot para atualização automática de dependências.
+  - Adicionar badge de status do build no README.
+  - Integrar análise estática de código ao pipeline.
+labels:
+  - melhoria
+  - devops
