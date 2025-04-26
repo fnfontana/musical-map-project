@@ -1,9 +1,6 @@
 import sys
 import os
-# Garante que a raiz do projeto está no sys.path para todos os contextos
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import folium
 import geopandas as gpd
@@ -117,6 +114,6 @@ if not is_test_env():
     resposta = input("Deseja adicionar links da Wikipedia aos gêneros musicais no mapa? (s/n): ").strip().lower()
     if resposta == 's':
         import subprocess
-        subprocess.run([sys.executable, 'add_wikipedia_links.py'])
+        subprocess.run([sys.executable, os.path.join('src', 'add_wikipedia_links.py')])
 
 bus.emit('end_processing')
