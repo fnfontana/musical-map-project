@@ -6,6 +6,7 @@ import json
 import time
 from geopy.geocoders import Nominatim
 from utils.cache import get_city_coords
+from core.database import get_styles_from_db
 
 def generate_map(style_df, output_html, cache_path):
     # Renomear colunas para merge
@@ -39,9 +40,15 @@ def generate_map(style_df, output_html, cache_path):
             else:
                 centroid = row['geometry'].centroid
                 lat, lon = centroid.y, centroid.x
+            # Adiciona link da Wikipedia se existir
+            wikipedia_link = row.get('wikipedia_link')
+            if wikipedia_link and isinstance(wikipedia_link, str) and wikipedia_link.strip():
+                genero_html = f'<a href="{wikipedia_link}" target="_blank">{row["Gênero musical"]}</a>'
+            else:
+                genero_html = f'<span style="color:#2a5599">{row["Gênero musical"]}</span>'
             popup_html = f'''
             <div style="width: 260px; font-size: 15px;">
-                <b>Gênero musical:</b> <span style="color:#2a5599">{row['Gênero musical']}</span><br>
+                <b>Gênero musical:</b> {genero_html}<br>
                 <b>Cidade:</b> <i>{row['Cidade']}</i><br>
                 <b>Comentário:</b><br>
                 <span style="font-size: 14px; color: #444;">{row['Comentário contextual']}</span>

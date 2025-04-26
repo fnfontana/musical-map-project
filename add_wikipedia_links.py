@@ -64,37 +64,39 @@ def add_wikipedia_links():
         cursor = conn.cursor()
 
         # Adicionar coluna para links da Wikipedia, se não existir
-        cursor.execute('''
-        ALTER TABLE musical_styles
-        ADD COLUMN wikipedia_link TEXT
-        ''')
-    except sqlite3.OperationalError:
-        # A coluna já existe
-        pass
-
-    # Obter gêneros musicais únicos que ainda não têm link
-    cursor.execute('SELECT DISTINCT genero_musical FROM musical_styles WHERE wikipedia_link IS NULL OR wikipedia_link = ""')
-    genres = cursor.fetchall()
-
-    for genre in genres:
-        genre_name = genre[0]
         try:
-            # Buscar link da Wikipedia usando a função que pode ser mockada
-            link = search_wikipedia_link(genre_name)
-            if link:
-                update_wikipedia_link(genre_name, link)
-                bus.emit('wikipedia_link_processed', genre=genre_name, link=link)
-            else:
-                bus.emit('wikipedia_link_error', genre=genre_name, reason='link não encontrado')
-        except Exception as e:
-            logger.error(f"Não foi possível encontrar um link para {genre_name}: {e}")
-            bus.emit('wikipedia_link_error', genre=genre_name, reason=str(e))
+            cursor.execute('''
+            ALTER TABLE musical_styles
+            ADD COLUMN wikipedia_link TEXT
+            ''')
+        except sqlite3.OperationalError:
+            # A coluna já existe
+            pass
 
-    # Salvar alterações e fechar conexão
-    conn.commit()
-    conn.close()
-    logger.info("Links da Wikipedia adicionados ao banco de dados com sucesso!")
-    bus.emit('wikipedia_links_success')
+        # Obter gêneros musicais únicos que ainda não têm link
+        cursor.execute('SELECT DISTINCT genero_musical FROM musical_styles WHERE wikipedia_link IS NULL OR wikipedia_link = ""')
+        genres = cursor.fetchall()
+
+        for genre in genres:
+            genre_name = genre[0]
+            try:
+                link = search_wikipedia_link(genre_name)
+                if link:
+                    update_wikipedia_link(genre_name, link)
+                    bus.emit('wikipedia_link_processed', genre=genre_name, link=link)
+                else:
+                    bus.emit('wikipedia_link_error', genre=genre_name, reason='link não encontrado')
+            except Exception as e:
+                logger.warning(f"Não foi possível encontrar um link para {genre_name}: {e}")
+                bus.emit('wikipedia_link_error', genre=genre_name, reason=str(e))
+
+        conn.commit()
+        conn.close()
+        logger.info("Links da Wikipedia adicionados ao banco de dados com sucesso!")
+        bus.emit('wikipedia_links_success')
+    except Exception as e:
+        logger.error(f"Erro ao adicionar links da Wikipedia: {e}")
+        bus.emit('wikipedia_links_error', error=str(e))
 
 # Ler gêneros musicais únicos do banco de dados SQLite
 def get_genres_from_db():
@@ -129,23 +131,10 @@ def main():
             time.sleep(2)  # Evita bloqueio do Google
         conn.commit()
         conn.close()
-        # Atualizar o HTML inserindo os links
-        html_file = "musical_map.html"
-        with open(html_file, 'r', encoding='utf-8') as f:
-            html = f.read()
-        for genre, link in wikipedia_links.items():
-            pattern = rf'(<b>Gênero musical:</b> <span style="color:#2a5599">){re.escape(genre)}(</span>)'
-            replacement = rf'\1<a href="{link}" target="_blank">{genre}</a>\2'
-            html, n = re.subn(pattern, replacement, html, count=1)
-            if n:
-                logger.info(f"Link inserido para: {genre}")
-                bus.emit('wikipedia_link_processed', genre=genre, link=link)
-        with open(html_file, 'w', encoding='utf-8') as f:
-            f.write(html)
-        logger.info("Links da Wikipedia inseridos no musical_map.html.")
+        logger.info("Links da Wikipedia processados com sucesso.")
         bus.emit('wikipedia_links_success')
     except Exception as e:
-        logger.error(f"Erro ao inserir links no HTML: {e}")
+        logger.error(f"Erro ao processar links da Wikipedia: {e}")
         bus.emit('wikipedia_links_error', error=str(e))
 
 if __name__ == "__main__":

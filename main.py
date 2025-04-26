@@ -12,6 +12,7 @@ from monitoring.events import bus
 from core.database import get_styles_from_db
 from core.map_generator import generate_map
 from monitoring.logger import get_logger
+from add_wikipedia_links import add_wikipedia_links
 
 logger = get_logger(__name__)
 
@@ -112,11 +113,7 @@ generate_map(style_df, OUTPUT_HTML, CACHE_PATH)
 bus.emit('map_generated', output=OUTPUT_HTML)
 logger.info(f"Mapa salvo em '{OUTPUT_HTML}'.")
 
-# Perguntar ao usuário se deseja adicionar links da Wikipedia
-if not is_test_env():
-    resposta = input("Deseja adicionar links da Wikipedia aos gêneros musicais no mapa? (s/n): ").strip().lower()
-    if resposta == 's':
-        import subprocess
-        subprocess.run([sys.executable, os.path.join('src', 'add_wikipedia_links.py')])
+# Adicionar links da Wikipedia automaticamente
+add_wikipedia_links()
 
 bus.emit('end_processing')
