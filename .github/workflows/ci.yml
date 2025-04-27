@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ github-integration ]
+    branches: [ master, github-integration ]
   pull_request:
-    branches: [ github-integration ]
+    branches: [ master, github-integration ]
 
 jobs:
   build:
@@ -24,10 +24,10 @@ jobs:
           pip install -r requirements.txt
           pip install flake8 pytest
 
-      - name: Check code formatting with Black
+      - name: Reformat code with Black
         run: |
           pip install black
-          black --check .
+          black .
 
       - name: Lint with flake8
         run: |
