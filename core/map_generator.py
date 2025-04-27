@@ -9,6 +9,11 @@ from core.geocoding import get_city_coordinates_with_cache
 from core.database import get_styles_from_db
 from interface.map_controls import add_layer_control
 from interface.markers import add_custom_marker
+import logging
+
+# Configuração do logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def generate_map(style_df, output_html, cache_path):
     # Renomear colunas para merge
