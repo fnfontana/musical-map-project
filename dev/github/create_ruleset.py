@@ -28,10 +28,10 @@ def main():
     data = load_ruleset()
     response = requests.post(url, headers=headers, data=data)
     print(f'Status: {response.status_code}')
-    try:
+    if response.ok:
         print(response.json())
-    except Exception:
-        print(response.text)
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
 
 if __name__ == '__main__':
     main()
