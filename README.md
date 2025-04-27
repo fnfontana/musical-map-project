@@ -1,5 +1,7 @@
 # Musical Map Project
 
+[![CI](https://github.com/fnfontana/musical-map-project/actions/workflows/ci.yml/badge.svg?branch=github-integration)](https://github.com/fnfontana/musical-map-project/actions/workflows/ci.yml)
+
 Projeto que visualiza estilos musicais nos Estados Unidos usando um mapa interativo. O mapa é gerado usando Python e diversas bibliotecas, incluindo Folium, GeoPandas e Geopy.
 
 ## Funcionalidades
