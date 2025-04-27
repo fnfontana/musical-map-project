@@ -27,6 +27,7 @@ def main():
     }
     data = load_ruleset()
     response = requests.post(url, headers=headers, data=data)
+    response.raise_for_status()
     print(f'Status: {response.status_code}')
     if response.ok:
         print(response.json())
