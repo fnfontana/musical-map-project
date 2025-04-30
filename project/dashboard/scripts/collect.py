@@ -5,6 +5,8 @@ from ghapi import GhApi
 
 def main():
     token = os.environ.get('GH_TOKEN')
+    if not token:
+        raise EnvironmentError("GH_TOKEN environment variable is not set. Please set it before running the script.")
     api = GhApi(owner='fnfontana', repo='musical-map-project', token=token)
 
     # Issues (filtra PRs)
