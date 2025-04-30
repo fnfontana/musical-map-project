@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Progresso - Musical Map Project</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f8fa;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
+        }
+
+        .task-card {
+            border-left: 4px solid transparent;
+        }
+
+        .task-card.pending {
+            border-left-color: #f59e0b;
+        }
+
+        .task-card.in-progress {
+            border-left-color: #3b82f6;
+        }
+
+        .task-card.completed {
+            border-left-color: #10b981;
+        }
+
+        .task-card.backlog {
+            border-left-color: #6b7280;
+        }
+
+        .timeline-connector {
+            width: 2px;
+            background-color: #d1d5db;
+        }
+
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .timeline-dot.completed {
+            background-color: #10b981;
+        }
+
+        .timeline-dot.current {
+            background-color: #3b82f6;
+        }
+
+        .timeline-dot.future {
+            background-color: #d1d5db;
+        }
+
+        .filter-btn.active {
+            background-color: #2563eb;
+            color: white;
+        }
+
+        #structure-diagram {
+            font-family: monospace;
+        }
+
+        .custom-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            display: none;
+            z-index: 100;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Dashboard de Progresso</h1>
+                <h2 class="text-xl text-gray-600">Musical Map Project</h2>
+            </div>
+            <div class="mt-4 md:mt-0">
+                <span class="text-sm text-gray-500">Última atualização: <span id="last-update"></span></span>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="rounded-full bg-blue-100 p-3 mr-4">
+                        <i class="fas fa-tasks text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-gray-500 text-sm">Tarefas Totais</h3>
+                        <p class="text-2xl font-bold">25</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-xs text-gray-500">Progresso geral</span>
+                        <span class="text-xs font-medium text-blue-600">45%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full">
+                        <div class="progress-bar bg-blue-600" style="width: 45%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="rounded-full bg-green-100 p-3 mr-4">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-gray-500 text-sm">Tarefas Concluídas</h3>
+                        <p class="text-2xl font-bold">11</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between text-xs text-gray-500">
+                        <span>Sistema Autônomo</span>
+                        <span>Interface Interativa</span>
+                        <span>Refatoração</span>
+                    </div>
+                    <div class="flex mt-2">
+                        <div class="bg-blue-500 h-2 rounded-l-full" style="width: 40%"></div>
+                        <div class="bg-green-500 h-2" style="width: 25%"></div>
+                        <div class="bg-yellow-500 h-2 rounded-r-full" style="width: 35%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="rounded-full bg-yellow-100 p-3 mr-4">
+                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-gray-500 text-sm">Sprint Atual</h3>
+                        <p class="text-2xl font-bold">2/5</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-xs text-gray-500">Progresso da sprint</span>
+                        <span class="text-xs font-medium text-yellow-600">75%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full">
+                        <div class="progress-bar bg-yellow-500" style="width: 75%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="rounded-full bg-purple-100 p-3 mr-4">
+                        <i class="fas fa-calendar-alt text-purple-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-gray-500 text-sm">Tempo Restante</h3>
+                        <p class="text-2xl font-bold">38 dias</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-xs text-gray-500">Timeline do projeto</span>
+                        <span class="text-xs font-medium text-purple-600">40%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full">
+                        <div class="progress-bar bg-purple-600" style="width: 40%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Overview and Progress Chart -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="card p-6 lg:col-span-2">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Progresso do Projeto</h3>
+                <canvas id="progressChart" height="250"></canvas>
+            </div>
+
+            <div class="card p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Distribuição por Componente</h3>
+                <canvas id="componentsChart" height="250"></canvas>
+            </div>
+        </div>
+
+        <!-- Sprint Timeline -->
+        <div class="card p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-6">Timeline de Sprints</h3>
+            <div class="relative">
+                <!-- Timeline -->
+                <div class="flex items-center mb-8">
+                    <div class="timeline-dot completed"></div>
+                    <div class="timeline-connector flex-grow mx-2"></div>
+                    <div class="timeline-dot current"></div>
+                    <div class="timeline-connector flex-grow mx-2"></div>
+                    <div class="timeline-dot future"></div>
+                    <div class="timeline-connector flex-grow mx-2"></div>
+                    <div class="timeline-dot future"></div>
+                    <div class="timeline-connector flex-grow mx-2"></div>
+                    <div class="timeline-dot future"></div>
+                </div>
+
+                <!-- Sprint Details -->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="card p-4 bg-gray-50 border border-green-500">
+                        <h4 class="font-bold text-green-600 mb-2">Sprint 1: Fundação <span
+                                class="text-sm font-normal text-green-500">(Concluído)</span></h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Sistema de
+                                configuração</li>
+                            <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Estrutura de
+                                logging</li>
+                            <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Refatoração
+                                do código base</li>
+                            <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Preparação de
+                                testes</li>
+                        </ul>
+                    </div>
+
+                    <div class="card p-4 bg-blue-50 border border-blue-500">
+                        <h4 class="font-bold text-blue-600 mb-2">Sprint 2: Automação <span
+                                class="text-sm font-normal text-blue-500">(Em progresso)</span></h4>
+                        <ul class="text-sm text-gray-600 space-y-1">
+                            <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Pipeline
+                                automático</li>
+                            <li class="flex items-center"><i class="fas fa-spinner text-blue-500 mr-2 fa-spin"></i>
+                                Implementação de monitores</li>
+                            <li class="flex items-center"><i class="fas fa-spinner text-blue-500 mr-2 fa-spin"></i>
+                                Integração de serviços externos</li>
+                            <li class="flex items-center"><i class="fas fa-hourglass-start text-gray-400 mr-2"></i>
+                                Validação de processos</li>
+                        </ul>
+                    </div>
+
+                    <div class="card p-4 bg-gray-50">
+                        <h4 class="font-bold text-gray-600 mb-2">Sprint 3: Interface Básica</h4>
+                        <ul class="text-sm text-gray-500 space-y-1">
+                            <li>Controles principais</li>
+                            <li>Sistema de busca</li>
+                            <li>Melhorar marcadores</li>
+                            <li>Criar filtros básicos</li>
+                        </ul>
+                    </div>
+
+                    <div class="card p-4 bg-gray-50">
+                        <h4 class="font-bold text-gray-600 mb-2">Sprint 4: Recursos Avançados</h4>
+                        <ul class="text-sm text-gray-500 space-y-1">
+                            <li>Desenvolver visualizações</li>
+                            <li>Implementar estatísticas</li>
+                            <li>Adicionar animações</li>
+                            <li>Integrar mídia</li>
+                        </ul>
+                    </div>
+
+                    <div class="card p-4 bg-gray-50">
+                        <h4 class="font-bold text-gray-600 mb-2">Sprint 5: Refinamento</h4>
+                        <ul class="text-sm text-gray-500 space-y-1">
+                            <li>Otimizar performance</li>
+                            <li>Ajustar UX/UI</li>
+                            <li>Documentar features</li>
+                            <li>Resolver bugs</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Status and Filtering -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+            <div class="card p-6 lg:col-span-1">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Filtrar por Componente</h3>
+                <div class="space-y-2">
+                    <button
+                        class="filter-btn active w-full py-2 px-4 text-sm rounded-md bg-gray-200 hover:bg-gray-300 transition"
+                        data-filter="all">Todos os Componentes</button>
+                    <button
+                        class="filter-btn w-full py-2 px-4 text-sm rounded-md bg-gray-200 hover:bg-gray-300 transition"
+                        data-filter="autonomous">Sistema Autônomo</button>
+                    <button
+                        class="filter-btn w-full py-2 px-4 text-sm rounded-md bg-gray-200 hover:bg-gray-300 transition"
+                        data-filter="interface">Interface Interativa</button>
+                    <button
+                        class="filter-btn w-full py-2 px-4 text-sm rounded-md bg-gray-200 hover:bg-gray-300 transition"
+                        data-filter="refactor">Refatoração da Arquitetura</button>
+                    <button
+                        class="filter-btn w-full py-2 px-4 text-sm rounded-md bg-gray-200 hover:bg-gray-300 transition"
+                        data-filter="data">Camada de Dados</button>
+                    <button
+                        class="filter-btn w-full py-2 px-4 text-sm rounded-md bg-gray-200 hover:bg-gray-300 transition"
+                        data-filter="monitoring">Monitoramento</button>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mt-6 mb-4">Filtrar por Status</h3>
+                <div class="space-y-2">
+                    <button
+                        class="status-btn active w-full py-2 px-4 text-sm rounded-md bg-gray-200 hover:bg-gray-300 transition"
+                        data-status="all">Todos os Status</button>
+                    <button
+                        class="status-btn w-full py-2 px-4 text-sm rounded-md bg-gray-200 hover:bg-gray-300 transition"
+                        data-status="backlog">Backlog</button>
+                    <button
+                        class="status-btn w-full py-2 px-4 text-sm rounded-md bg-gray-200 hover:bg-gray-300 transition"
+                        data-status="pending">Pendente</button>
+                    <button
+                        class="status-btn w-full py-2 px-4 text-sm rounded-md bg-gray-200 hover:bg-gray-300 transition"
+                        data-status="in-progress">Em Progresso</button>
+                    <button
+                        class="status-btn w-full py-2 px-4 text-sm rounded-md bg-gray-200 hover:bg-gray-300 transition"
+                        data-status="completed">Concluído</button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Status das Tarefas</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="task-container">
+                    <!-- Backlog Column -->
+                    <div class="card p-4">
+                        <h4 class="font-bold text-gray-700 mb-3 flex items-center"><i class="fas fa-list-ul mr-2"></i>
+                            Backlog <span class="ml-auto bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full"
+                                id="backlog-count">6</span></h4>
+                        <div class="space-y-3 task-list" data-status="backlog">
+                            <div class="task-card backlog p-3 bg-gray-50 rounded shadow-sm" data-component="interface">
+                                <h5 class="font-semibold text-sm">Adicionar marcadores inteligentes</h5>
+                                <p class="text-xs text-gray-500 mt-1">Interface Interativa</p>
+                            </div>
+                            <div class="task-card backlog p-3 bg-gray-50 rounded shadow-sm" data-component="interface">
+                                <h5 class="font-semibold text-sm">Implementar sistema de busca</h5>
+                                <p class="text-xs text-gray-500 mt-1">Interface Interativa</p>
+                            </div>
+                            <div class="task-card backlog p-3 bg-gray-50 rounded shadow-sm" data-component="refactor">
+                                <h5 class="font-semibold text-sm">Refatorar sistema de cache</h5>
+                                <p class="text-xs text-gray-500 mt-1">Refatoração da Arquitetura</p>
+                            </div>
+                            <div class="task-card backlog p-3 bg-gray-50 rounded shadow-sm" data-component="data">
+                                <h5 class="font-semibold text-sm">Implementar backup automático</h5>
+                                <p class="text-xs text-gray-500 mt-1">Camada de Dados</p>
+                            </div>
+                            <div class="task-card backlog p-3 bg-gray-50 rounded shadow-sm" data-component="monitoring">
+                                <h5 class="font-semibold text-sm">Adicionar alertas automáticos</h5>
+                                <p class="text-xs text-gray-500 mt-1">Monitoramento</p>
+                            </div>
+                            <div class="task-card backlog p-3 bg-gray-50 rounded shadow-sm" data-component="interface">
+                                <h5 class="font-semibold text-sm">Visualização estatística avançada</h5>
+                                <p class="text-xs text-gray-500 mt-1">Interface Interativa</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- In Progress Column -->
+                    <div class="card p-4">
+                        <h4 class="font-bold text-gray-700 mb-3 flex items-center"><i class="fas fa-spinner mr-2"></i>
+                            Em Progresso <span class="ml-auto bg-blue-200 text-blue-700 text-xs px-2 py-1 rounded-full"
+                                id="in-progress-count">8</span></h4>
+                        <div class="space-y-3 task-list" data-status="in-progress">
+                            <div class="task-card in-progress p-3 bg-blue-50 rounded shadow-sm"
+                                data-component="autonomous">
+                                <h5 class="font-semibold text-sm">Implementar monitores de sistema</h5>
+                                <p class="text-xs text-gray-500 mt-1">Sistema Autônomo</p>
+                            </div>
+                            <div class="task-card in-progress p-3 bg-blue-50 rounded shadow-sm"
+                                data-component="autonomous">
+                                <h5 class="font-semibold text-sm">Integrar serviços externos</h5>
+                                <p class="text-xs text-gray-500 mt-1">Sistema Autônomo</p>
+                            </div>
+                            <div class="task-card in-progress p-3 bg-blue-50 rounded shadow-sm"
+                                data-component="autonomous">
+                                <h5 class="font-semibold text-sm">Sistema de configuração via arquivo</h5>
+                                <p class="text-xs text-gray-500 mt-1">Sistema Autônomo</p>
+                            </div>
+                            <div class="task-card in-progress p-3 bg-blue-50 rounded shadow-sm"
+                                data-component="refactor">
+                                <h5 class="font-semibold text-sm">Migrar código para estrutura modular</h5>
+                                <p class="text-xs text-gray-500 mt-1">Refatoração da Arquitetura</p>
+                            </div>
+                            <div class="task-card in-progress p-3 bg-blue-50 rounded shadow-sm" data-component="data">
+                                <h5 class="font-semibold text-sm">Otimizar consultas ao banco de dados</h5>
+                                <p class="text-xs text-gray-500 mt-1">Camada de Dados</p>
+                            </div>
+                            <div class="task-card in-progress p-3 bg-blue-50 rounded shadow-sm"
+                                data-component="refactor">
+                                <h5 class="font-semibold text-sm">Implementar padrão Observer</h5>
+                                <p class="text-xs text-gray-500 mt-1">Refatoração da Arquitetura</p>
+                            </div>
+                            <div class="task-card in-progress p-3 bg-blue-50 rounded shadow-sm"
+                                data-component="monitoring">
+                                <h5 class="font-semibold text-sm">Sistema de detecção automática de erros</h5>
+                                <p class="text-xs text-gray-500 mt-1">Monitoramento</p>
+                            </div>
+                            <div class="task-card in-progress p-3 bg-blue-50 rounded shadow-sm"
+                                data-component="interface">
+                                <h5 class="font-semibold text-sm">Protótipo de controles interativos</h5>
+                                <p class="text-xs text-gray-500 mt-1">Interface Interativa</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed Column -->
+                    <div class="card p-4">
+                        <h4 class="font-bold text-gray-700 mb-3 flex items-center"><i
+                                class="fas fa-check-circle mr-2"></i> Concluído <span
+                                class="ml-auto bg-green-200 text-green-700 text-xs px-2 py-1 rounded-full"
+                                id="completed-count">11</span></h4>
+                        <div class="space-y-3 task-list" data-status="completed">
+                            <div class="task-card completed p-3 bg-green-50 rounded shadow-sm"
+                                data-component="autonomous">
+                                <h5 class="font-semibold text-sm">Implementar pipeline automático</h5>
+                                <p class="text-xs text-gray-500 mt-1">Sistema Autônomo</p>
+                            </div>
+                            <div class="task-card completed p-3 bg-green-50 rounded shadow-sm"
+                                data-component="refactor">
+                                <h5 class="font-semibold text-sm">Criar estrutura de diretórios</h5>
+                                <p class="text-xs text-gray-500 mt-1">Refatoração da Arquitetura</p>
+                            </div>
+                            <div class="task-card completed p-3 bg-green-50 rounded shadow-sm"
+                                data-component="autonomous">
+                                <h5 class="font-semibold text-sm">Implementar sistema de logging</h5>
+                                <p class="text-xs text-gray-500 mt-1">Sistema Autônomo</p>
+                            </div>
+                            <div class="task-card completed p-3 bg-green-50 rounded shadow-sm"
+                                data-component="interface">
+                                <h5 class="font-semibold text-sm">Atualizar biblioteca de mapas Folium</h5>
+                                <p class="text-xs text-gray-500 mt-1">Interface Interativa</p>
+                            </div>
+                            <div class="task-card completed p-3 bg-green-50 rounded shadow-sm" data-component="data">
+                                <h5 class="font-semibold text-sm">Configurar banco SQLite</h5>
+                                <p class="text-xs text-gray-500 mt-1">Camada de Dados</p>
+                            </div>
+                            <div class="task-card completed p-3 bg-green-50 rounded shadow-sm"
+                                data-component="refactor">
+                                <h5 class="font-semibold text-sm">Refatorar código principal</h5>
+                                <p class="text-xs text-gray-500 mt-1">Refatoração da Arquitetura</p>
+                            </div>
+                            <div class="task-card completed p-3 bg-green-50 rounded shadow-sm"
+                                data-component="monitoring">
+                                <h5 class="font-semibold text-sm">Configurar sistema de monitoramento básico</h5>
+                                <p class="text-xs text-gray-500 mt-1">Monitoramento</p>
+                            </div>
+                            <div class="task-card completed p-3 bg-green-50 rounded shadow-sm" data-component="data">
+                                <h5 class="font-semibold text-sm">Implementar sistema de cache</h5>
+                                <p class="text-xs text-gray-500 mt-1">Camada de Dados</p>
+                            </div>
+                            <div class="task-card completed p-3 bg-green-50 rounded shadow-sm"
+                                data-component="autonomous">
+                                <h5 class="font-semibold text-sm">Integração com Wikipedia API</h5>
+                                <p class="text-xs text-gray-500 mt-1">Sistema Autônomo</p>
+                            </div>
+                            <div class="task-card completed p-3 bg-green-50 rounded shadow-sm"
+                                data-component="autonomous">
+                                <h5 class="font-semibold text-sm">Implementar serviço de geocodificação</h5>
+                                <p class="text-xs text-gray-500 mt-1">Sistema Autônomo</p>
+                            </div>
+                            <div class="task-card completed p-3 bg-green-50 rounded shadow-sm"
+                                data-component="interface">
+                                <h5 class="font-semibold text-sm">Configurar personalizações de ícones</h5>
+                                <p class="text-xs text-gray-500 mt-1">Interface Interativa</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Structure -->
+        <div class="card p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Estrutura do Projeto</h3>
+            <div class="text-sm bg-gray-100 p-4 rounded-md overflow-x-auto" id="structure-diagram">
+                <pre>
+musical-map-project/
+ ├── src/                     # Código fonte principal
+ │   ├── main.py              # Script principal do mapa
+ │   ├── add_wikipedia_links.py  # Integração com Wikipedia
+ │   ├── populate_database.py    # População do banco de dados
+ │   └── watch_database.py       # Monitoramento de mudanças
+ ├── tests/                  # Testes unitários e de integração
+ ├── data/                   # Dados e banco SQLite
+ ├── output/                 # Arquivos gerados
+ ├── config/                 # Arquivos de configuração
+ ├── project/                # Documentação do projeto
+ └── backup/                 # Backup de dados importantes
+</pre>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-800 mt-8 mb-4">Nova Arquitetura Proposta</h3>
+            <div class="text-sm bg-gray-100 p-4 rounded-md overflow-x-auto" id="new-structure-diagram">
+                <pre>
+musical-map-project/
+ ├── config/                  # Módulos de configuração
+ │   ├── config.py            # Configurações globais
+ │   ├── settings.yaml        # Configuração do usuário
+ │   └── defaults.py          # Valores padrão
+ ├── core/                    # Módulos principais
+ │   ├── database.py          # Gerenciamento do banco
+ │   ├── geocoding.py         # Serviços de geocodificação
+ │   ├── map_generator.py     # Geração de mapas
+ │   └── wikipedia_integration.py # Integração Wikipedia
+ ├── monitoring/              # Sistema de monitoramento
+ │   ├── watcher.py           # Monitor de mudanças
+ │   ├── logger.py            # Sistema de logging
+ │   └── events.py            # Gerenciamento de eventos
+ ├── interface/               # Componentes de interface
+ │   ├── map_controls.py      # Controles do mapa
+ │   ├── markers.py           # Personalização marcadores
+ │   ├── search.py            # Sistema de busca
+ │   └── filters.py           # Filtros e visualizações
+ ├── utils/                   # Utilitários
+ │   ├── validators.py        # Validação de dados
+ │   ├── cache.py             # Gerenciamento de cache
+ │   └── helpers.py           # Funções auxiliares
+ ├── tests/                   # Testes
+ ├── data/                    # Dados
+ └── output/                  # Saídas geradas
+</pre>
+            </div>
+        </div>
+
+        <!-- Metrics and Key Indicators -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="card p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Métricas-Chave do Projeto</h3>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-600">Cobertura de testes</span>
+                            <span class="text-sm font-medium text-blue-600">78%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full">
+                            <div class="progress-bar bg-blue-600" style="width: 78%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-600">Qualidade do código</span>
+                            <span class="text-sm font-medium text-green-600">85%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full">
+                            <div class="progress-bar bg-green-600" style="width: 85%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-600">Documentação</span>
+                            <span class="text-sm font-medium text-yellow-600">65%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full">
+                            <div class="progress-bar bg-yellow-600" style="width: 65%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-600">Automação do sistema</span>
+                            <span class="text-sm font-medium text-purple-600">55%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full">
+                            <div class="progress-bar bg-purple-600" style="width: 55%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm text-gray-600">Interatividade da interface</span>
+                            <span class="text-sm font-medium text-indigo-600">30%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full">
+                            <div class="progress-bar bg-indigo-600" style="width: 30%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Distribuição de Esforços</h3>
+                <canvas id="effortChart" height="250"></canvas>
+            </div>
+        </div>
+
+        <!-- Risks and Challenges -->
+        <div class="card p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Riscos e Desafios</h3>
+            <div class="space-y-4">
+                <div class="flex p-4 rounded-md bg-yellow-50 border-l-4 border-yellow-500">
+                    <div class="flex-shrink-0 mr-3">
+                        <i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-yellow-800">Integração com Serviços Externos</h4>
+                        <p class="text-sm text-yellow-700 mt-1">Possíveis limitações de API e rate limits na
+                            geocodificação e integração com Wikipedia podem afetar a confiabilidade do sistema autônomo.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex p-4 rounded-md bg-red-50 border-l-4 border-red-500">
+                    <div class="flex-shrink-0 mr-3">
+                        <i class="fas fa-times-circle text-red-500 text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-red-800">Performance de Renderização</h4>
+                        <p class="text-sm text-red-700 mt-1">A adição de controles interativos e visualizações complexas
+                            pode impactar a performance de renderização dos mapas, especialmente com grandes volumes de
+                            dados.</p>
+                    </div>
+                </div>
+
+                <div class="flex p-4 rounded-md bg-blue-50 border-l-4 border-blue-500">
+                    <div class="flex-shrink-0 mr-3">
+                        <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-blue-800">Refatoração de Arquitetura</h4>
+                        <p class="text-sm text-blue-700 mt-1">A mudança para uma arquitetura baseada em eventos exige
+                            uma refatoração significativa do código existente, podendo introduzir bugs temporários
+                            durante a transição.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="card p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Próximos Passos</h3>
+            <ul class="space-y-3">
+                <li class="flex items-start">
+                    <div
+                        class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                        1</div>
+                    <div>
+                        <h4 class="font-semibold">Finalizar Implementação do Sistema de Eventos</h4>
+                        <p class="text-sm text-gray-600 mt-1">Concluir a implementação do sistema de eventos para
+                            permitir o processamento assíncrono dos dados e a atualização automática do mapa.</p>
+                    </div>
+                </li>
+
+                <li class="flex items-start">
+                    <div
+                        class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                        2</div>
+                    <div>
+                        <h4 class="font-semibold">Iniciar Desenvolvimento dos Controles Interativos</h4>
+                        <p class="text-sm text-gray-600 mt-1">Começar a desenvolver os controles interativos do mapa,
+                            incluindo filtros por gênero musical e região geográfica.</p>
+                    </div>
+                </li>
+
+                <li class="flex items-start">
+                    <div
+                        class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                        3</div>
+                    <div>
+                        <h4 class="font-semibold">Melhorar Sistema de Cache</h4>
+                        <p class="text-sm text-gray-600 mt-1">Aprimorar o sistema de cache em dois níveis para otimizar
+                            a performance das consultas e reduzir chamadas redundantes a serviços externos.</p>
+                    </div>
+                </li>
+
+                <li class="flex items-start">
+                    <div
+                        class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                        4</div>
+                    <div>
+                        <h4 class="font-semibold">Ampliar Cobertura de Testes</h4>
+                        <p class="text-sm text-gray-600 mt-1">Aumentar a cobertura de testes automatizados para garantir
+                            a robustez do sistema durante a refatoração.</p>
+                    </div>
+                </li>
+
+                <li class="flex items-start">
+                    <div
+                        class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
+                        5</div>
+                    <div>
+                        <h4 class="font-semibold">Desenvolver Visualizações Estatísticas</h4>
+                        <p class="text-sm text-gray-600 mt-1">Criar visualizações estatísticas para análise da
+                            distribuição de gêneros musicais por região geográfica.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="custom-tooltip" id="tooltip"></div>
+
+    <script>
+        async function initDashboard() {
+            const res = await fetch('data.json');
+            const { issues: tasks, milestones: sprints, commitsCount } = await res.json();
+            renderTasks(tasks);
+            renderSprints(sprints);
+            updateCharts(tasks, sprints, commitsCount);
+            document.getElementById('last-update').textContent = new Date().toLocaleString('pt-BR');
+        }
+        initDashboard();
+    </script>
+</body>
+
+</html>
