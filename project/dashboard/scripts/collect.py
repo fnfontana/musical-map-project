@@ -9,8 +9,15 @@ def main():
         raise EnvironmentError("GH_TOKEN environment variable is not set. Please set it before running the script.")
     api = GhApi(owner='fnfontana', repo='musical-map-project', token=token)
 
-    # Issues (filtra PRs)
-    all_issues = api.issues.list_for_repo(state='all', per_page=100)
+    # Issues (filtra PRs) - handle pagination to fetch all issues
+    all_issues = []
+    page = 1
+    while True:
+        issues_page = api.issues.list_for_repo(state='all', page=page, per_page=100)
+        if not issues_page:
+            break
+        all_issues.extend(issues_page)
+        page += 1
     issues = [i for i in all_issues if not getattr(i, 'pull_request', None)]
     tasks = []
     for i in issues:
