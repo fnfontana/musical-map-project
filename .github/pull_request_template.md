@@ -3,6 +3,7 @@
 Descreva brevemente as mudanças propostas neste pull request.
 
 # Checklist
+
 - [ ] O código foi testado localmente
 - [ ] Os testes automatizados passaram
 - [ ] O código segue o padrão de formatação (Black)
