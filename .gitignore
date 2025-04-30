@@ -45,6 +45,10 @@ tasks/
 temp/
 project/
 
+# Permitir o dashboard dentro de `project/`
+!project/dashboard/
+!project/dashboard/**
+
 # Ignorar arquivos temporários
 *.tmp
 
