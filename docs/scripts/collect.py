@@ -53,7 +53,7 @@ def main():
         'milestones': milestones,
         'commitsCount': commit_count
     }
-    output_path = "docs/dashboard/data.json"
+    output_path = "docs/data.json"
     with open(output_path, "w") as f:
         json.dump(output, f, indent=2)
 
