@@ -1,4 +1,19 @@
 #!/usr/bin/env python3
+"""
+Este script faz parte do dashboard de desenvolvimento hospedado no GitHub Pages.
+Ele coleta dados do GitHub e gera o arquivo `data.json` para alimentar o dashboard.
+
+Observações:
+- Este script é independente do programa principal.
+- Requer Python 3.10 e um ambiente separado.
+- Não utiliza o `requirements.txt` do programa principal.
+
+Como executar:
+```bash
+conda activate dashboard-py310
+python docs/scripts/collect.py
+```
+"""
 import os
 import json
 from ghapi.core import GhApi  # type: ignore

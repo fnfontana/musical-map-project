@@ -25,7 +25,8 @@ musical-map-project/
 ├── output/                # Arquivos gerados
 ├── config/                # Arquivos de configuração
 ├── project/               # Documentação do projeto
-└── backup/               # Backup de dados importantes
+├── backup/               # Backup de dados importantes
+└── docs/                 # Dashboard de desenvolvimento
 ```
 
 ## Documentação
@@ -84,6 +85,30 @@ A documentação completa do projeto está organizada no GitHub Projects, dividi
    ```bash
    python src/watch_database.py
    ```
+
+## Dashboard de Desenvolvimento (GitHub Pages)
+
+A pasta `docs/` contém arquivos relacionados ao dashboard de desenvolvimento do projeto, que é hospedado no GitHub Pages. Este dashboard é usado para monitorar o progresso do projeto principal e não faz parte diretamente do programa principal.
+
+### Componentes do Dashboard
+
+- **`index.html`**: Página principal do dashboard.
+- **`data.json`**: Arquivo gerado dinamicamente contendo dados do progresso do projeto.
+- **`scripts/collect.py`**: Script responsável por coletar dados do GitHub e gerar o arquivo `data.json`.
+- **Outros arquivos**: Documentação e ferramentas auxiliares para o dashboard.
+
+### Observações
+
+- O dashboard é independente do programa principal e utiliza um ambiente Python separado (recomendado Python 3.10).
+- Para atualizar os dados do dashboard, execute o script `collect.py` no ambiente apropriado.
+
+```bash
+# Exemplo de execução do collect.py
+conda activate dashboard-py310
+python docs/scripts/collect.py
+```
+
+Para mais informações sobre o dashboard, consulte a documentação em `docs/`.
 
 ## Testes
 
