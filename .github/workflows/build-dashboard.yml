@@ -15,7 +15,7 @@ jobs:
         python-version: '3.10'
     - name: Collect dashboard data
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Alterado para usar o segredo criado para Actions
       run: |
         pip install ghapi
         python docs/dashboard/scripts/collect.py > docs/dashboard/data.json
