@@ -18,7 +18,7 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         pip install ghapi
-        python project/dashboard/scripts/collect.py > project/dashboard/data.json
+        python docs/dashboard/scripts/collect.py > docs/dashboard/data.json
     - name: Commit & Push data.json
       run: |
         git config --global user.email "bot@users.noreply.github.com"

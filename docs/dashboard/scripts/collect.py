@@ -53,7 +53,9 @@ def main():
         'milestones': milestones,
         'commitsCount': commit_count
     }
-    print(json.dumps(output))
+    output_path = "docs/dashboard/data.json"
+    with open(output_path, "w") as f:
+        json.dump(output, f, indent=2)
 
 if __name__ == '__main__':
     main()
