@@ -3,10 +3,14 @@ import os
 import json
 from ghapi import GhApi
 
+
 def main():
     token = os.environ.get('GH_TOKEN')
     if not token:
-        raise EnvironmentError("GH_TOKEN environment variable is not set. Please set it before running the script.")
+        raise EnvironmentError(
+            "GH_TOKEN environment variable is not set. "
+            "Please set it before running the script."
+        )
     api = GhApi(owner='fnfontana', repo='musical-map-project', token=token)
 
     # Issues (filtra PRs) - handle pagination to fetch all issues
@@ -21,9 +25,9 @@ def main():
     issues = [i for i in all_issues if not getattr(i, 'pull_request', None)]
     tasks = []
     for i in issues:
-        labels = [l.name for l in i.labels]
-        comp = next((l for l in labels if l in ['autonomous','interface','refactor','data','monitoring']), 'other')
-        status = next((l for l in labels if l in ['backlog','in-progress','completed']), None)
+        labels = [label.name for label in i.labels]
+        comp = next((label for label in labels if label in ['autonomous','interface','refactor','data','monitoring']), 'other')
+        status = next((label for label in labels if label in ['backlog','in-progress','completed']), None)
         status = status or ('completed' if i.state == 'closed' else 'pending')
         tasks.append({
             'title': i.title,
