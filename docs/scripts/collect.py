@@ -62,7 +62,7 @@ def main():
         )
 
     # Milestones
-    ms = api.repos.list_milestones_for_repo(state="all", per_page=10)
+    ms = api.issues.list_milestones(state="all", per_page=10)
     milestones = []
     milestones.extend(
         {
