@@ -18,11 +18,11 @@ jobs:
         GH_TOKEN: ${{ secrets.GH_TOKEN }}  # Alterado para usar o segredo criado para Actions
       run: |
         pip install ghapi
-        python docs/dashboard/scripts/collect.py > docs/dashboard/data.json
+        python docs/scripts/collect.py
     - name: Commit & Push data.json
       run: |
         git config --global user.email "bot@users.noreply.github.com"
         git config --global user.name "dashboard-bot"
-        git add project/dashboard/data.json
+        git add docs/data.json
         git commit -m "chore: update dashboard data [skip ci]" || echo "no changes"
         git push
